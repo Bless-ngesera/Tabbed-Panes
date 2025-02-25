@@ -1,9 +1,17 @@
 package Performance;
+
+import Management.Player;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 public class Performance {
+    private List<Player> signedPlayers;
+
+    public Performance(List<Player> signedPlayers) {
+        this.signedPlayers = signedPlayers;
+    }
     public JPanel createPerformanceTab() {
         JPanel panel = new JPanel(new BorderLayout());
         String[] columns = {"Player", "Goals", "Assists"};
@@ -11,7 +19,15 @@ public class Performance {
         JTable table = new JTable(tableModel);
 
         JButton addButton = new JButton("Add Performance");
-        addButton.addActionListener(e -> tableModel.addRow(new Object[]{"Player " + (tableModel.getRowCount() + 1), 0, 0}));
+        addButton.addActionListener(e -> {
+            int rowCount = tableModel.getRowCount();
+            if (rowCount < signedPlayers.size()) {
+                String playerName = signedPlayers.get(rowCount).getName();
+                tableModel.addRow(new Object[]{playerName, 0, 0});
+            } else {
+                JOptionPane.showMessageDialog(null, "No more players to add performance for.");
+            }
+        });
 
         JButton clearButton = new JButton("Clear Data");
         clearButton.addActionListener(e -> tableModel.setRowCount(0));
@@ -26,7 +42,8 @@ public class Performance {
         return panel;
     }
 
-    public static JPanel getPerformancePanel() {
-        return new Performance().createPerformanceTab();
+    public static JPanel getPerformancePanel(List<Player> signedPlayers) {
+        return new Performance(signedPlayers).createPerformanceTab();
     }
 }
+

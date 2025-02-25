@@ -1,6 +1,8 @@
 package Actions;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 public class Actions {
     public JPanel createActionsTab() {
         JPanel panel = new JPanel();
