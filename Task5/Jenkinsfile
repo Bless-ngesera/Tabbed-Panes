@@ -1,73 +1,61 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'MAVEN_HOME'  // Use the Maven installation configured in Jenkins
+    }
+
     environment {
-        // Define environment variables if needed
-        ANDROID_HOME = '/path/to/android/sdk'
-        GRADLE_HOME = '/path/to/gradle'
-        PROJECT_DIR = 'Task5' // Change to your project directory name
+        POM_PATH = 'Task5/pom.xml'  // Path to your parent POM file
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the code from your Git repository
                 git branch: 'main', url: 'https://github.com/Bless-ngesera/Tabbed-Panes'
             }
         }
 
-        stage('Setup Android SDK') {
+        stage('Build') {
             steps {
                 script {
-                    // Ensure that the Android SDK is set up (download/update SDK if necessary)
-                    sh "$ANDROID_HOME/tools/bin/sdkmanager --update"
-                    sh "$ANDROID_HOME/tools/bin/sdkmanager 'platforms;android-30' 'build-tools;30.0.3'"
+                    echo "Building project with Maven..."
+                    bat "mvn -f ${POM_PATH} clean install"
                 }
             }
         }
 
-        stage('Build APK') {
+        stage('Test') {
             steps {
-                // Build the APK using Gradle
-                dir(PROJECT_DIR) {
-                    sh "./gradlew clean build"
+                script {
+                    echo "Running unit tests..."
+                    bat "mvn -f ${POM_PATH} test"
                 }
             }
         }
 
-        stage('Run Unit Tests') {
+        stage('Package') {
             steps {
-                // Run unit tests for your project (optional, but recommended)
-                dir(PROJECT_DIR) {
-                    sh "./gradlew test"
-                }
-            }
-        }
-
-        stage('Build Release APK') {
-            steps {
-                // Build release APK
-                dir(PROJECT_DIR) {
-                    sh "./gradlew assembleRelease"
+                script {
+                    echo "Packaging application..."
+                    bat "mvn -f ${POM_PATH} package"
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                // Deploy APK to your deployment platform (e.g., Firebase, Play Store, etc.)
-                // Add your deployment logic here (e.g., upload the APK, send notifications, etc.)
-                echo 'Deployment stage (implement as per your needs)'
+                echo "Deployment stage (modify as needed)..."
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline executed successfully!'
+            echo "Pipeline executed successfully! 🎉"
         }
         failure {
-            echo 'Pipeline failed!'
+            echo "Pipeline failed! Check the logs. ❌"
         }
     }
 }
